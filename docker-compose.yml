@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: KM_db
+    environment:
+        - POSTGRES_USER=${DB_USER}
+        - POSTGRES_PASSWORD=${DB_PASSWORD}
+        - POSTGRES_DB=${DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-km_db}"]
+      timeout: 5s
+      interval: 9s
+      start_period: 9s
+      retries: 3
+    volumes:
+      - bd_data:/var/lib/postgresql/data
+    networks:
+      - db_net
+
+  web_app:
+    build: .
+    ports:
+      - "8000:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src:/python_app
+    networks:
+      - db_net
+
+volumes:
+  bd_data:
+
+networks:
+  db_net:
+    driver: bridge
