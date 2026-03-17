@@ -1,11 +1,18 @@
 # Core Framework
 fastapi==0.135.1
 uvicorn[standard]==0.41.0
+starlette==0.52.1
+idna==3.11
+h11==0.16.0
+click==8.3.1
+anyio==4.12.1
 pydantic==2.12.5
+pydantic_core==2.41.5
+PyJWT==2.11.0
 authx==1.5.1
-
-# Environment variables
-#python-dotenv==1.0.0
+typing-inspection==0.4.2
+typing_extensions==4.15.0
 
 # Database
+psycopg2==2.9.11
 psycopg2-binary==2.9.11
