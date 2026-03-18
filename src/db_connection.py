@@ -17,7 +17,7 @@ class Database:
             cls.connection_pool = psycopg2.pool.SimpleConnectionPool(
                 1,
                 20,
-                host='localhost',
+                host='db',
                 port=5432,
                 database=os.getenv('DB_NAME'),
                 user=os.getenv('DB_USER'),

@@ -1,37 +1,38 @@
+version: '3.8'
+
 services:
   db:
     image: postgres:16-alpine
-    container_name: KM_db
+    container_name: project_db
     environment:
-        - POSTGRES_USER=${DB_USER}
-        - POSTGRES_PASSWORD=${DB_PASSWORD}
-        - POSTGRES_DB=${DB_NAME}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-km_db}"]
-      timeout: 5s
-      interval: 9s
-      start_period: 9s
-      retries: 3
-    volumes:
-      - bd_data:/var/lib/postgresql/data
-    networks:
-      - db_net
-
-  web_app:
-    build: .
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "8000:80"
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: project_app
+    ports:
+      - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+    env_file:
+      - .env
     volumes:
-      - ./src:/python_app
-    networks:
-      - db_net
+      - ./src:/app/src
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
-  bd_data:
-
-networks:
-  db_net:
-    driver: bridge
+  postgres_data:
